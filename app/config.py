@@ -20,7 +20,7 @@ class DevAppSettings(AppSettings):
     class Config:
         env_file = ".dev.env"
 
-    log_level: str = logging.DEBUG
+    log_level: int = logging.DEBUG
 
 
 class StgAppSettings(AppSettings):

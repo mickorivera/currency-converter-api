@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 def get_exchange_rates(
     source_currency: str,
     target_currency: str,
-    year: Optional[int] = Query(default=None, ge=1999, le=2021),
+    year: Optional[int] = Query(default=None, ge=1999),
     month: Optional[int] = Query(default=None, ge=1, le=12),
     day: Optional[int] = Query(default=None, ge=1, le=31),
 ):
@@ -37,6 +37,7 @@ def get_exchange_rates(
         f"Processing request for exchange rate"
         f"  for {source_currency}/{target_currency}..."
     )
+    cur_date = datetime.now().date()
     try:
         target_date = datetime(year, month, day).date()
     except (ValueError, TypeError):
@@ -44,10 +45,10 @@ def get_exchange_rates(
             "Target date either not provided or invalid!"
             " Defaulting to current date..."
         )
-        target_date = datetime.now().date()
+        target_date = cur_date
 
-    if target_date < datetime(1999, 1, 1).date():
-        logger.error(f"Provided date({target_date}) < 1999-01-01!")
+    if target_date > cur_date:
+        logger.error(f"Provided date({target_date}) > current date!")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Invalid date: {target_date}!",

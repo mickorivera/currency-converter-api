@@ -1,0 +1,6 @@
+-r ./base.txt
+
+mockito==1.2.2
+pytest==6.2.3
+pytest-cov==2.11.1
+pytest-env==0.6.2
