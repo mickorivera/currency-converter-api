@@ -7,7 +7,7 @@ import requests
 from fastapi import APIRouter, HTTPException, Query, status
 from typing import Optional
 
-from config import get_app_settings
+from app.config import get_app_settings
 from app.models.currencies import CurrencyRateResponse
 
 
