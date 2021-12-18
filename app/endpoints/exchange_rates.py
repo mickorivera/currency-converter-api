@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from typing import Optional
 
 from app.config import get_app_settings
-from app.models.currencies import CurrencyRateResponse
+from app.models.currencies import CurrencyRateResponse, CurrencySymbolsResponse
 
 
 router = APIRouter()
@@ -41,7 +41,7 @@ def get_exchange_rates(
     try:
         target_date = datetime(year, month, day).date()
     except (ValueError, TypeError):
-        logger.warn(
+        logger.warning(
             "Target date either not provided or invalid!"
             " Defaulting to current date..."
         )
@@ -104,4 +104,45 @@ def get_exchange_rates(
         "target_currency": target_currency,
         "rate": rates.get(target_currency.upper()),
         "date": datetime.strptime(str(target_date), "%Y-%m-%d"),
+    }
+
+
+@router.get(
+    path="/supported-currencies",
+    response_model=CurrencySymbolsResponse,
+    response_description="List of supported currencies with description.",
+    status_code=status.HTTP_200_OK,
+    description="Returns list of supported currencies.",
+)
+def get_supported_currencies():
+    logger.info(
+        f"Retrieving supported symbols:"
+        f" host: {app_settings.exchange_rate_host}/symbols"
+    )
+    response = requests.get(
+        url=urlparse.urljoin(app_settings.exchange_rate_host, "symbols"),
+    )
+    # TODO: create class for exchange rate api
+    if response.status_code != status.HTTP_200_OK:
+        logger.error(f"Unable to query exchange rate server: {response.text}!")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"External exchange rate server error: {response.text}!"
+        )
+
+    response_dict = json.loads(response.text)
+    symbols = response_dict.get("symbols")
+
+    if not symbols or not response_dict.get("success"):
+        logger.error(f"Unable to retrieve supported symbols: {response_dict}!")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Invalid exchange rate server response!",
+        )
+
+    logger.info(
+        f"Successfully retrieved list of supported currencies: {symbols}"
+    )
+    return {
+        "supported_currencies": list(symbols.values()),
     }
