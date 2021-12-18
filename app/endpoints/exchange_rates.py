@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from typing import Optional
 
 from config import get_app_settings
-from models.currencies import CurrencyRateResponse
+from app.models.currencies import CurrencyRateResponse
 
 
 router = APIRouter()

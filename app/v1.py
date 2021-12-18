@@ -1,6 +1,6 @@
 from fastapi import FastAPI, status
 
-from apps.currencies.endpoints.api import router
+from app.endpoints.api import router
 
 
 app = FastAPI(

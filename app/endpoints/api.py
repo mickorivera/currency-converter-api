@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from apps.currencies.endpoints import exchange_rates
+from app.endpoints import exchange_rates
 
 
 router = APIRouter()
