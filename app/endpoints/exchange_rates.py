@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 from datetime import datetime
 from urllib import parse as urlparse
 
@@ -29,6 +30,7 @@ logger = logging.getLogger(__name__)
 def get_exchange_rates(
     source_currency: str,
     target_currency: str,
+    amount: float = Query(default=1, gt=0),
     year: Optional[int] = Query(default=None, ge=1999),
     month: Optional[int] = Query(default=None, ge=1, le=12),
     day: Optional[int] = Query(default=None, ge=1, le=31),
@@ -102,7 +104,11 @@ def get_exchange_rates(
     return {
         "source_currency": source_currency,
         "target_currency": target_currency,
-        "rate": rates.get(target_currency.upper()),
+        "rate": math.ceil(
+            (
+                amount * rates.get(target_currency.upper())
+            ) * (10 ** app_settings.exchange_rate_decimal_places)
+        ) / (10 ** app_settings.exchange_rate_decimal_places),
         "date": datetime.strptime(str(target_date), "%Y-%m-%d"),
     }
 

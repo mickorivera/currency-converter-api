@@ -10,7 +10,7 @@ class EnvSettings(BaseSettings):
 
 class AppSettings(BaseSettings):
     exchange_rate_host: str
-    exchange_rate_decimal_places: str = 2
+    exchange_rate_decimal_places: int = 2
 
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     log_level: int = logging.INFO
