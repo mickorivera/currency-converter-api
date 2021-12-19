@@ -1,4 +1,5 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.endpoints.api import router
 
@@ -11,3 +12,10 @@ app = FastAPI(
     description="Currency rate conversion API",
 )
 app.include_router(router, prefix="/v1")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
